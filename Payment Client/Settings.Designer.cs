@@ -25,7 +25,7 @@ namespace Payment_Client {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.0.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.0.0")]
         public string BLOCKCHAINREG_API_VERSION {
             get {
                 return ((string)(this["BLOCKCHAINREG_API_VERSION"]));

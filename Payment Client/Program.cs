@@ -24,13 +24,13 @@ namespace Payment_Client
             string AliceName = "Alice";
             string AliceSin = String.Empty ;
             // Test Token, replace with your node issued JwtSecurityToken
-            string RegistrationToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJUeE5vIjoiNmQ4YzkzNGEtNTg3Ni00OWVjLWE3YTktNmEzZDMyNGI0NDg4IiwibmFtZWlkIjoiMDEwMTE0MkVDM0UxQkU3REFCNTBFQTJGRUYyODIzRkNDRDc4QzU2OEVEOTExNCIsIm5iZiI6MTYzMDk2MzgzNywiZXhwIjoxNjMxNTY4NjM1LCJpYXQiOjE2MzA5NjM4MzcsImlzcyI6IjAxMDExNEUyMjU0RkNBODM1QjUwODU2MDFDQ0UyNDc5NENFODg0NDM0ODJFN0YiLCJhdWQiOiJEZXZpY2UgUmVnaXN0cmF0aW9uIn0.6LQWwCssoaDBOY5AuGswePFiMrbd2o6Appf535Av5PU";
+            string sJwtSecurityToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJUeE5vIjoiNmQ4YzkzNGEtNTg3Ni00OWVjLWE3YTktNmEzZDMyNGI0NDg4IiwibmFtZWlkIjoiMDEwMTE0MkVDM0UxQkU3REFCNTBFQTJGRUYyODIzRkNDRDc4QzU2OEVEOTExNCIsIm5iZiI6MTYzMDk2MzgzNywiZXhwIjoxNjMxNTY4NjM1LCJpYXQiOjE2MzA5NjM4MzcsImlzcyI6IjAxMDExNEUyMjU0RkNBODM1QjUwODU2MDFDQ0UyNDc5NENFODg0NDM0ODJFN0YiLCJhdWQiOiJEZXZpY2UgUmVnaXN0cmF0aW9uIn0.6LQWwCssoaDBOY5AuGswePFiMrbd2o6Appf535Av5PU";
             // Test Payee, replace with actual payee Secure Identity
             string JohnSin = "0101148159A9B51BAFD8193139C8E7FDBECC9E2BC1E56F";
 
             // Staging Steps
             // Decode JWToken
-            var jwtToken = new JwtSecurityToken(RegistrationToken);
+            var jwtToken = new JwtSecurityToken(sJwtSecurityToken);
             string NodeSin = jwtToken.Issuer.ToString();
             IEnumerable<Claim> claims = jwtToken.Claims;
             // Check JwtSecurityToken expire for validity..
@@ -66,8 +66,8 @@ namespace Payment_Client
             }
             // Register Device
             String registrationToken = "";
-            String recoveryToken = Register.RegisterDevice(AliceName, NodeSin, AliceSin, registrationToken);
-
+            String recoveryToken = Register.RegisterDevice(AliceName, NodeSin, AliceSin, null, sJwtSecurityToken);
+            
             // Step 2: Code Payment client, Payment authorisation 
             // Debit Party
             DeviceSecureIdentity id = ids.getLastByLable(AliceName, SinNodeType.Payment);

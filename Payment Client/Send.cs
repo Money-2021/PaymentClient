@@ -39,7 +39,10 @@ namespace Payment_Client
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("x-accept-version", Settings.Default.BLOCKCHAINREG_API_VERSION);
                 _httpClient.DefaultRequestHeaders.Add("x-blockchain-plugin-info", BLOCKCHAINREG_PLUGIN_INFO);
+                // JwtSecurityToken payment authorization
+                _httpClient.DefaultRequestHeaders.Add("x-authorization",id.token);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
 
                 // Generate signature
                 byte[] signature = Device.SignData(name, Encoding.UTF8.GetBytes(id.sin));
