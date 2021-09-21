@@ -16,7 +16,8 @@ namespace Payment_Client
 
         public static byte[] EncryptData( byte[] staticPublicKey, byte[] data, out byte[] ephemeralPUblicKey )
         {
-            using (ECDiffieHellmanCng ephemeraKey = new ECDiffieHellmanCng())
+            CngKey orignKey = CngKey.Create(CngAlgorithm.ECDiffieHellmanP256);
+            using (ECDiffieHellmanCng ephemeraKey = new ECDiffieHellmanCng(orignKey))
             {
 
                 ephemeraKey.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash; // RFC 5753: dhSinglePass-stdDH-sha256kdf 
@@ -26,10 +27,11 @@ namespace Payment_Client
                 CngKey recipientKey = CngKey.Import(staticPublicKey, CngKeyBlobFormat.EccPublicBlob);
                 byte[] derivedKey = ephemeraKey.DeriveKeyMaterial(recipientKey);
                 // ECIES uses AES with the all zero IV.
+                byte[] bytesIV = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                 using (Aes aes = new AesManaged())
                 {
                     aes.Key = derivedKey;
-                    aes.IV = null;
+                    aes.IV = bytesIV;
                     aes.Mode = CipherMode.CBC;
                     aes.Padding = PaddingMode.PKCS7; // Old world default
                     return aes.CreateEncryptor().TransformFinalBlock(data, 0, data.Length);
