@@ -5,7 +5,7 @@ Place the four supplied dll files inside this directory and build the Payment Cl
 
 vm.data.library.blockchain.api.device.Model // Device Support
 vm.data.library.blockchain.cms.Model        // IETF CMS RFC5652 Model
-vm.data.library.blockchain.cms.Msg          // IETF CMS RFC5652 Message Sets
+vm.data.library.blockchain.payment.api          // InterLedger Protocol(ILP)-Payment Message Sets
 vm.data.library.blockchain.secureidentity.api  // HSM, Secure Identity support
 
 The output executables will also be automatcally placed subordinate to this directory.
