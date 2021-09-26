@@ -4,7 +4,7 @@ These will be returned by the nominated node, along with the JWToken registratio
 Place the four supplied dll files inside this directory and build the Payment Client.
 
 vm.data.library.blockchain.api.device.Model // Device Support
-vm.data.library.blockchain.cms.Model        // IETF CMS RFC5652 Model
+vm.data.library.blockchain.cms.Model        // IETF CMS RFC5652 Model, and Cryptographic Synatax Support (re-engineered into JSON).
 vm.data.library.blockchain.payment.api          // InterLedger Protocol(ILP)-Payment Message Sets
 vm.data.library.blockchain.secureidentity.api  // HSM, Secure Identity support
 
