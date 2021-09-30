@@ -26,7 +26,7 @@ namespace Payment_Client
                 ephemeralPUblicKey = ephemeraKey.PublicKey.ToByteArray();
                 CngKey recipientKey = CngKey.Import(staticPublicKey, CngKeyBlobFormat.EccPublicBlob);
                 byte[] derivedKey = ephemeraKey.DeriveKeyMaterial(recipientKey);
-                // ECIES uses AES with the all zero IV.
+                // InterLedger based ECIES uses AES-256, CBC mode, with PKCS7 Padding, with the all zero IV.
                 byte[] bytesIV = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                 using (Aes aes = new AesManaged())
                 {
