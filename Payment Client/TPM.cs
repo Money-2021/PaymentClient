@@ -121,8 +121,8 @@ namespace Payment_Client
             if (!CngKey.Exists(keyName, microsoftSoftwareKeyStorageProvider))
             {
                 CngKey key = CngKey.Open(keyName);
-                using DSACng signer = new (key);
-                return signer.SignData(hashBytes, HashAlgorithmName.SHA256);
+                using ECDsaCng signer = new (key);
+                return signer.SignHash(hashBytes);
 
             }
             else
@@ -140,8 +140,8 @@ namespace Payment_Client
             if (!CngKey.Exists(keyName, microsoftSoftwareKeyStorageProvider))
             {
                 CngKey key = CngKey.Open(keyName);
-                using DSACng signer = new (key);
-                return signer.VerifySignature(hashBytes, signature);
+                using ECDsaCng signer = new (key);
+                return signer.VerifyHash(hashBytes, signature);
             }
             else
                 throw new CryptographicException($"The key with the name '{keyName}' does not exists!");
@@ -162,7 +162,7 @@ namespace Payment_Client
             if (!CngKey.Exists(keyName, microsoftSoftwareKeyStorageProvider))
             {
                 CngKey key = CngKey.Open(keyName);
-                using DSACng signer = new (key);
+                using ECDsaCng signer = new (key);
                 return signer.SignData(hashBytes, HashAlgorithmName.SHA256);
             }
             else
@@ -185,8 +185,8 @@ namespace Payment_Client
             if (!CngKey.Exists(keyName, microsoftSoftwareKeyStorageProvider))
             {
                 CngKey key = CngKey.Open(keyName);
-                using DSACng signer = new (key);
-                return signer.VerifySignature(hashBytes, signature);
+                using ECDsaCng signer = new (key);
+                return signer.VerifyHash(hashBytes, signature);
             }
             else
                 throw new CryptographicException($"The key with the name '{keyName}' does not exists!");
