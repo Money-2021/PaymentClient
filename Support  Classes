@@ -1,0 +1,14 @@
+  public class RecoveryResponse
+  {
+      public RecoveryResponse() 
+      {
+      }
+      public RecoveryResponse(bool protect)
+      {
+          isProtected = protect;
+      }
+      public string setupcode { get; set; }
+      public string userToken { get; set; }
+      public bool? isProtected { get; set; } //  encrypted setupcode
+  }
+
