@@ -1,2 +1,2 @@
 # PaymentClient
-Public Domain port of Block Chain Ledger Payment Rail- Client source code.
+Public Domain port of The Coin Payment Rail- Client source code.
