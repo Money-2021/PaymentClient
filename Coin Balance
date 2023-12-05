@@ -1,0 +1,32 @@
+ [TestMethod]
+ public void UseCase_payment_coin_balance()
+ {
+     Set_AUD();
+     string folder = Environment.GetEnvironmentVariable("Envionment");
+     string credit_sin = Environment.GetEnvironmentVariable("SinC");
+     string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
+     RecoveryResponse rsp = GetUserToken(userTokenPath);
+     string userToken = rsp.userToken;
+
+  
+     // Extract Function endpoint from User Token
+     var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(userToken);
+     Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+     HttpClient _httpClient = new HttpClient();
+     string _relativeUrl = "api/Payment/Balance";
+     Uri _uri = new Uri(_baseUri, _relativeUrl);
+     _httpClient.BaseAddress = _baseUri;
+     _httpClient.DefaultRequestHeaders.Add("x-token", userToken);
+     HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+     if (response.IsSuccessStatusCode)
+     {
+         // Balance Amount
+         string jwToken = response.Content.ReadAsStringAsync().Result;
+         decimal balance = decimal.Parse(jwToken);
+         Debug.WriteLine("Balance : " + balance.ToString("N2"));
+     }
+     else
+     {
+         string sError = response.Content.ReadAsStringAsync().Result;
+     }
+ }
