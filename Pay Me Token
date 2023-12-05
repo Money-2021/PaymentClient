@@ -1,0 +1,37 @@
+ [TestMethod]
+ public void UseCase_payment_IssuePayMeToken()
+ {
+     Set_AZN();
+     string folder = Environment.GetEnvironmentVariable("Envionment");
+     string SecureIdentity = Environment.GetEnvironmentVariable("SinA");
+     decimal amount = 2.50M;
+     // Owner calls SignHash with ContentHash
+     string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + SecureIdentity + ".jwt";
+     RecoveryResponse rsp = GetUserToken(userTokenPath);
+     // Extract Function endpoint from User Token
+     var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(rsp.userToken);
+     Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+     //_baseUri = new Uri("http://localhost:54718/");
+     // Obtain Function JwToken
+     HttpClient _httpClient = new HttpClient();
+     // Build funtion endpoint Uri
+     string _relativeUrl = "api/Payment/IssuePayMeToken?amount=" + amount.ToString("N2");
+     Uri _uri = new Uri(_baseUri, _relativeUrl);
+     _httpClient.BaseAddress = _baseUri;
+     // Add User Jwtoken
+     _httpClient.DefaultRequestHeaders.Add("x-token", rsp.userToken);
+     // Get response
+     HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+     if (response.IsSuccessStatusCode)
+     {
+         string jwToken = response.Content.ReadAsStringAsync().Result;
+         string sPath = @"D:\Examples\" + node + @"\Payments\PayMe-" + SecureIdentity + ".jwt";
+         System.IO.File.WriteAllText(sPath, jwToken);
+     }
+     else
+     {
+         // fail
+         string error = response.Content.ReadAsStringAsync().Result;
+         throw new Exception(error);
+     }
+ }
