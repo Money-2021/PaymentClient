@@ -128,5 +128,11 @@ Support Code
        }
    }
 
+private static bool VerifySignature(byte[] hashBytes, byte[] signature, byte[] publickKey)
+{
+    CngKey key = CngKey.Import(publickKey, CngKeyBlobFormat.EccPublicBlob);
+    ECDsaCng signer = new ECDsaCng(key);
+    return signer.VerifyHash(hashBytes, signature);
+}
 
 
