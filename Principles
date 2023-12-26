@@ -1,5 +1,5 @@
 Principles:
-1. While the API is a RPC HTTP envionment all APUD's are stateless datagrams.
+1. While the API is a RPC HTTP envionment all APDU's are stateless and hence self contained datagrams.
 2. All Coins are stateless datagrams
 3. Within the Finacial Market Infastucture, whcih includes the payment rail, there exist no accounts, no network, no seessions, no wallet and no counterparties 
 4. All payments are between two payment Secure Identity enmdpoints, with absolute payment finality
