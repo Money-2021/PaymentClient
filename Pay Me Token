@@ -35,3 +35,50 @@
          throw new Exception(error);
      }
  }
+
+ [TestMethod]
+ public void UseCase_payment_coin_payme_lt()
+ {
+     // Pay SinC WCU-LT 
+
+     Set_AUD();
+     string folder = Environment.GetEnvironmentVariable("Envionment");
+     // Issue PayMe Token for SinC
+     string credit_sin = Environment.GetEnvironmentVariable("SinC"); // 
+     string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
+     RecoveryResponse rsp = GetUserToken(userTokenPath);
+     string userToken = rsp.userToken;
+     decimal amount = 5; // WCU-LT
+   
+     // Extract Function endpoint from User Token
+     var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(userToken);
+     Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+     HttpClient _httpClient = new HttpClient();
+
+     // Build funtion endpoint Uri
+     string _relativeUrl = "api/User/IssuePayMeToken";
+     Uri _uri = new Uri(_baseUri, _relativeUrl);
+     var postParms = new Dictionary<string, string>
+      {
+            { "amount", amount.ToString("N2") },
+            { "lt", "true" } // force WCU-LT payment
+      };
+     string url = BuildUrlWithQueryStringUsingUriBuilder(_uri.AbsoluteUri, postParms);
+     // Buid, absolute Uri
+     _uri = new Uri(url);
+     _httpClient.DefaultRequestHeaders.Add("x-token", userToken);
+     HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+     if (response.IsSuccessStatusCode)
+     {
+         string jwToken = response.Content.ReadAsStringAsync().Result;
+         // Test
+         bool bResult = ApplicationCoinProvider.ValidatePayMe(jwToken);
+         // Save PayMe 
+         string payMeTokenPath = @"D:\Examples\" + node + @"\Payments\PayMeToken-" + credit_sin + ".jwt";
+         System.IO.File.WriteAllText(payMeTokenPath, jwToken);
+     }
+     else
+     {
+         string sError = response.Content.ReadAsStringAsync().Result;
+     }
+ }
