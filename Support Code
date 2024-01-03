@@ -143,4 +143,42 @@ public static string BuildUrlWithQueryStringUsingUriBuilder(string basePath, Dic
     return uriBuilder.Uri.AbsoluteUri;
 }
 
+// World Currecny Rate for 1/100 of an oz of gold
+[TestMethod]
+public void UseCase_payment_worldcurrency_rate()
+{
+    Set_AUD();
+    string folder = Environment.GetEnvironmentVariable("Envionment");
+    string sin = Environment.GetEnvironmentVariable("SinB");
+    //  User Token
+    string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + sin + ".jwt";
+    RecoveryResponse rsp = GetUserToken(userTokenPath);
 
+    // Extract Function endpoint from User Token
+    var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(rsp.userToken);
+    Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+    // Obtain Function JwToken
+    HttpClient _httpClient = new HttpClient();
+    // Build funtion endpoint Uri
+    string _relativeUrl = "api/Payment/WorldCurrencyRate";
+    Uri _uri = new Uri(_baseUri, _relativeUrl);
+    _httpClient.BaseAddress = _baseUri;
+    _httpClient.DefaultRequestHeaders.Add("x-token", rsp.userToken);
+
+ 
+    HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+    if (response.IsSuccessStatusCode)
+    {
+        string srate  = response.Content.ReadAsStringAsync().Result;
+        decimal rate = decimal.Parse(srate);
+        // WCU quote for AUD 100
+        decimal value =   Math.Round(100 / rate, 4);
+        Debug.WriteLine("AUD 100 = " + value.ToString("N4") +" bits or AUD " + (rate * 100).ToString("N4") + " per Oz" );
+
+    }
+    else
+    {
+        string sError = response.Content.ReadAsStringAsync().Result;
+        throw new Exception(sError);
+    }
+}
