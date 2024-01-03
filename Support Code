@@ -143,7 +143,7 @@ public static string BuildUrlWithQueryStringUsingUriBuilder(string basePath, Dic
     return uriBuilder.Uri.AbsoluteUri;
 }
 
-// World Currecny Rate for 1/100 of an oz of gold
+// World Currency Rate for 1/100 of an oz of gold
 [TestMethod]
 public void UseCase_payment_worldcurrency_rate()
 {
