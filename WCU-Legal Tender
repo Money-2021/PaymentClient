@@ -56,7 +56,7 @@ In order to utilise WCU-LT based P2P payments the recipient must generate a WCU-
 
       Set_AZN();
       string folder = Environment.GetEnvironmentVariable("Envionment");
-      // Issue PayMe Token for SinC
+      // Issue PayMe Token for SinB
       string credit_sin = Environment.GetEnvironmentVariable("SinB"); // 
       string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
       RecoveryResponse rsp = GetUserToken(userTokenPath);
@@ -174,9 +174,8 @@ In order to utilise WCU-LT based P2P payments the recipient must generate a WCU-
   {
       // Pay SinC WCU-LT 
 
-      Set_AUD();
+      Set_AZN();
       string folder = Environment.GetEnvironmentVariable("Envionment");
-      // Issue PayMe Token for SinC
       string credit_sin = Environment.GetEnvironmentVariable("SinB"); // 
       string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
       RecoveryResponse rsp = GetUserToken(userTokenPath);
