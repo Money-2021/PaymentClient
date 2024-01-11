@@ -3,7 +3,88 @@ The DAX requires no centralised Exchange and operates under each juridictions Co
 Each Equity Share is a Digital Bearer Asset.
 
 1. Primary Market
-a) IPO, Issue Shares on Primary market
+a) Issue Corproations Shares
+  [TestMethod]
+  public void UseCase_mkt_primary_issue()
+  {
+
+      // Primary Market
+      // Issue Shares
+      Set_AUD();
+      string folder = Environment.GetEnvironmentVariable("Envionment");
+      Guid orderbookNo = new Guid(Environment.GetEnvironmentVariable("BHPOrderBook"));
+      int qty = 10100;
+      string sin = Environment.GetEnvironmentVariable("BHP");
+      string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + sin + ".jwt";
+      RecoveryResponse r = GetUserToken(userTokenPath);
+
+      // Extract Function endpoint from User Token
+      var securityToken = new JwtSecurityToken(r.userToken);
+      Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+      HttpClient _httpClient = new HttpClient();
+      _httpClient.BaseAddress = _baseUri;
+      // Build funtion endpoint Uri
+      string _relativeUrl = "api/User/SignHash?type=" + ProviderType.Order.ToString(); // Market order
+      Uri _uri = new Uri(_baseUri, _relativeUrl);
+      _httpClient.BaseAddress = _baseUri;
+      // Add User Jwtoken
+      _httpClient.DefaultRequestHeaders.Add("x-token", r.userToken);
+      // Add OTP 
+      Guid nonce = Guid.NewGuid();
+      _httpClient.DefaultRequestHeaders.Add("x-nonce", nonce.ToString());
+      // Transation Hash
+      string _shash = nonce.ToString() + orderbookNo.ToString() + sin + qty.ToString("N0") + qty.ToString("N0");
+      byte[] hashBytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(_shash));
+      _httpClient.DefaultRequestHeaders.Add("x-hash", Convert.ToBase64String(hashBytes));
+      // autheticate
+      var twoFactorAuthenticator = new Google.Authenticator.TwoFactorAuthenticator();
+      long counter = BytesToLong(hashBytes);
+      string otpPin = twoFactorAuthenticator.GeneratePINAtInterval(r.setupcode, counter);
+      _httpClient.DefaultRequestHeaders.Add("x-otp", otpPin);
+      string signHashResponse = null;
+      HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+      if (response.IsSuccessStatusCode)
+      {
+          // Save Authorisation
+          signHashResponse = response.Content.ReadAsStringAsync().Result;
+      }
+      else
+      {
+          string sError = response.Content.ReadAsStringAsync().Result;
+          throw new Exception(sError);
+      }
+
+      // Load post content 
+      StringContent content = new StringContent(signHashResponse);
+
+      // Build funtion endpoint Uri
+      _relativeUrl = "api/EquityMarket/IssueShares";
+      _uri = new Uri(_baseUri, _relativeUrl);
+      var postParms = new Dictionary<string, string>
+          {
+              { "orderbookNo", orderbookNo.ToString() },
+              { "qty", qty.ToString("N2") }
+          };
+      string url = BuildUrlWithQueryStringUsingUriBuilder(_uri.AbsoluteUri, postParms);
+      // Buid, absolute Uri
+      _uri = new Uri(url);
+
+      // Post 
+      _httpClient = new HttpClient();
+      _httpClient.BaseAddress = _baseUri;
+      response = _httpClient.PostAsync(_uri, content).Result;
+      if (response.IsSuccessStatusCode)
+      {
+         // Do nothing if OK
+      }
+      else
+      {
+          string sError = response.Content.ReadAsStringAsync().Result;
+          throw new Exception(sError);
+      }
+
+  }
+b) IPO, Issue and Price Shares on Primary market
   [TestMethod]
   public void UseCase_mkt_primary_execute_sell()
   {
