@@ -1,4 +1,4 @@
-// PRIMARY MARKET
+// SECONDARY MARKET
 
  [TestMethod]
  public void UseCase_mkt_primary_execute_sell()
