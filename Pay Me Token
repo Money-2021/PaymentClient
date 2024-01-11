@@ -1,4 +1,6 @@
- [TestMethod]
+1. Issue LCU PayMe Token
+
+[TestMethod]
  public void UseCase_payment_IssuePayMeToken()
  {
      Set_AZN();
@@ -35,7 +37,7 @@
          throw new Exception(error);
      }
  }
-
+2. Issue WCU-LT Payment
  [TestMethod]
  public void UseCase_payment_coin_payme_lt()
  {
