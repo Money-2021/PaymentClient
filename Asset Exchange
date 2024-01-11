@@ -1,4 +1,6 @@
 This code exercises the Decentralised Asset eXchange (DAX).
+The DAX requires no centralised Exchange and operates under each juridictions Corporation Laws and regultions regarding the Issueance of Securitiees or Equity based Stocks/Shares
+
 1. Primary Market
 a) IPO, Issue Shares on Primary market
   [TestMethod]
