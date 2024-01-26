@@ -1,3 +1,6 @@
+Non-AI Licenses
+This repository contains templates for software and digital work licenses that restrict software and other work from being used in AI training datasets or AI technologies.
+
 # Payment Client
 Public Domain port of The Coin Payment Rail- Client source code.
 
