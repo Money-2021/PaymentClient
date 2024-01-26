@@ -4,7 +4,7 @@ This repository contains templates for software and digital work licenses that r
 # Payment Client
 Public Domain port of The Coin Payment Rail- Client source code.
 
-This public domain code and licence is provided, under the attached licence, as a public good by the International Settlment Associations (ISA) as outlined  within
+This public domain code and licence is provided to persons, under the attached licence, as a public good by the International Settlment Associations (ISA) as outlined  within
 https://www.numeraire.work/ 
 According to its statutes:
 https://www.numeraire.work/statutes
