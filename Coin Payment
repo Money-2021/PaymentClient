@@ -1,4 +1,5 @@
-    [TestMethod]
+// User Token Payments
+[TestMethod]
 public void UseCase_payment_coin_pay_to_sin()
 {
     // PayToSin combined Mint Coin plus Process Coin
@@ -110,3 +111,88 @@ public void UseCase_payment_coin_pay_to_sin()
         throw new Exception(sError);
     }
 }
+
+// Device Payments
+ [TestMethod]
+ public void UseCase_payment_coin_pay_to_sin_fido()
+ {
+     // PayToSin combined Mint Coin plus Process Coin
+     // Credit AZN, Debit AUD
+
+     Set_AZN();
+     string folder = Environment.GetEnvironmentVariable("Envionment");
+     // Credit
+     // Generate PayMeToken
+     string credit_sin = Environment.GetEnvironmentVariable("SinB");
+     string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
+     RecoveryResponse rsp = GetUserToken(userTokenPath);
+     string userToken = rsp.userToken;
+     decimal amount = 10.15M; // AZN
+
+     // Extract Function endpoint from User Token
+     var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(userToken);
+     Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+     HttpClient _httpClient = new HttpClient();
+     string _relativeUrl = "api/Coin/IssuePayMeToken?amount=" + amount.ToString("N2");
+     Uri _uri = new Uri(_baseUri, _relativeUrl);
+     _httpClient.BaseAddress = _baseUri;
+     _httpClient.DefaultRequestHeaders.Add("x-token", userToken);
+     HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+     string payMeToken = string.Empty;
+     if (response.IsSuccessStatusCode)
+     {
+         payMeToken = response.Content.ReadAsStringAsync().Result;
+     }
+     else
+     {
+         string sError = response.Content.ReadAsStringAsync().Result;
+         throw new Exception(sError);
+     }
+
+     // Debit
+     Set_AUD();
+     // Debit
+     folder = Environment.GetEnvironmentVariable("Envionment");
+
+     // Device Store
+     string device_sin = Environment.GetEnvironmentVariable("DeviceSinA");  // Use fido  DeviceSinA
+     string spath = @"D:\Examples\Devices\DeviceStore-" + device_sin + ".json";
+     SoftFidoProvider.Fido.DeviceStore store = GetDeviceFidoStore(spath);
+
+     // Calculate Payment Hash
+     // store.SecureIdentity is the HSM debit secure Identity which is bound to Device Secure Identity both local and node
+     string shash = payMeToken + store.SecureIdentity;
+     byte[] hashBytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(shash));
+
+     // Device Signs Payment
+     SoftFidoProvider.Fido d = new SoftFidoProvider.Fido(store.SecureIdentity, store.ProtectedDeviceKey);
+     string signHashResponse = d.SignHashRsp(store.KeyHandle, hashBytes, store.JwToken);
+
+     // Test returned Payment Signature
+     bool bResult = d.VerifyRsp(signHashResponse);
+     if (bResult == false)
+         throw new Exception();
+
+     // Load post content 
+     StringContent content = new StringContent(signHashResponse);
+     // Post to debit infastruture
+     _httpClient = new HttpClient();
+     _relativeUrl = "api/Coin/PayToSin";
+     _uri = new Uri(_baseUri, _relativeUrl);
+     _httpClient.BaseAddress = _baseUri;
+     _httpClient.DefaultRequestHeaders.Add("x-token", payMeToken); // Auth Token
+     response = _httpClient.PostAsync(_uri, content).Result;
+     if (response.IsSuccessStatusCode)
+     {
+         // PaymentResponse to debitor 
+         string json = response.Content.ReadAsStringAsync().Result;
+         string receiptPath = @"D:\Examples\" + node + @"\Payments\CoinPaymentReceipt-" + device_sin + ".jwt";
+         System.IO.File.WriteAllText(receiptPath, json);
+     }
+     else
+     {
+         string sError = response.Content.ReadAsStringAsync().Result;
+         throw new Exception(sError);
+     }
+ }
+
