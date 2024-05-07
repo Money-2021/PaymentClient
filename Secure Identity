@@ -1,0 +1,95 @@
+
+1. Create New secure Identoty, via LCA operator token
+ [TestMethod]
+ public void UseCase_create_secure_identity()
+ {
+     // Must be called with the LCA operator Token
+     Set_AUD();
+     string folder = Environment.GetEnvironmentVariable("Envionment");
+     string issuer = Environment.GetEnvironmentVariable("Issuer");
+     string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + issuer + ".jwt";
+     string jwt = System.IO.File.ReadAllText(userTokenPath);
+     RecoveryResponse r = System.Text.Json.JsonSerializer.Deserialize<RecoveryResponse>(jwt);
+     string userToken = r.userToken;
+
+     // Extract Function endpoint from User Token
+     var securityToken = new JwtSecurityToken(userToken);
+     Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+
+     ApplicationJwtProvider.TokenType type = ApplicationJwtProvider.ExtractProviderTokenType(userToken);
+
+     // Gen otp
+     var twoFactorAuthenticator = new Google.Authenticator.TwoFactorAuthenticator();
+     string _nonce = Guid.NewGuid().ToString();
+     byte[] hashBytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(issuer + _nonce));
+     long counter = BytesToLong(hashBytes); // remove time interval
+     string otpPin = twoFactorAuthenticator.GeneratePINAtInterval(r.setupcode, counter);
+     // Recovery Token
+     HttpClient _httpClient = new HttpClient();
+     // Build funtion endpoint Uri
+     string _relativeUrl = "api/Provider/CreateSecureIdentity";
+     Uri _uri = new Uri(_baseUri, _relativeUrl);
+     _httpClient.BaseAddress = _baseUri;
+     // Add User Jwtoken
+     _httpClient.DefaultRequestHeaders.Add("x-token", userToken);
+     _httpClient.DefaultRequestHeaders.Add("x-otp", otpPin);
+     _httpClient.DefaultRequestHeaders.Add("x-nonce", _nonce);
+
+     // Get response
+     HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+     if (response.IsSuccessStatusCode)
+     {
+         string recoveryToken = response.Content.ReadAsStringAsync().Result;
+         string secureIdentity = ApplicationJwtProvider.ExtractSecureIdentity(recoveryToken);
+         // Save SecureIdentity Recovery Token
+         string _filePath = @"D:\Examples\" + node + @"\" + folder + "\\RecoveryToken-" + secureIdentity + ".jwt";
+         System.IO.File.WriteAllText(_filePath, recoveryToken);
+
+     }
+     else
+     {
+         // Error Message
+         String sError = response.Content.ReadAsStringAsync().Result;
+     }
+ }
+2. Issue UserToken using recovery token above.
+[TestMethod]
+public void UseCase_UserTokenRecovery()
+{
+    Set_AUD();
+    string folder = Environment.GetEnvironmentVariable("Envionment");
+    string SecureIdentity = Environment.GetEnvironmentVariable("SinC");
+    string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\RecoveryToken-" + SecureIdentity + ".jwt";
+    string recoveryToken = System.IO.File.ReadAllText(userTokenPath);
+  
+  
+    // Extract Function endpoint from User Token
+    var securityToken = new JwtSecurityToken(recoveryToken);
+    Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+
+    // Recovery Token
+    HttpClient _httpClient = new HttpClient();
+    // Build funtion endpoint Uri
+    string _relativeUrl = "api/User/UserTokenRecovery";
+    Uri _uri = new Uri(_baseUri, _relativeUrl);
+    _httpClient.BaseAddress = _baseUri;
+    // Add User Jwtoken
+    _httpClient.DefaultRequestHeaders.Add("x-token", recoveryToken);
+
+    // Get response
+    HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+    if (response.IsSuccessStatusCode)
+    {
+        string userToken = response.Content.ReadAsStringAsync().Result;
+        string secureIdentity = ApplicationJwtProvider.ExtractSecureIdentity(recoveryToken);
+
+        string _filePath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + secureIdentity + ".jwt";
+        System.IO.File.WriteAllText(_filePath, recoveryToken);
+
+    }
+    else
+    {
+        // Error Message
+        String sError = response.Content.ReadAsStringAsync().Result;
+    }
+}
