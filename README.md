@@ -3,8 +3,8 @@ This repository contains templates for software and digital work licenses that r
 
 # Payment Client
 Public Domain port of The Coin Payment Rail- Client source code.
-The SDK is a set of Visual Studio Unit test case that can be executed within Visual Studion with out the need for any further development. 
-In order to use the Inovation Hun infastucture one must obtian a Seure Identity->User Topken from an ISA member.
+The SDK is a set of Visual Studio Unit test cases, which can be executed within Visual Studio, without the need for any further application development. 
+In order to use the Inovation Hub infastucture, each developer or user, must first obtain a Seure Identity->User Token and prefunded WCU bits from an ISA member.
 
 This public domain code and licence is provided to persons, under the attached licence, as a public good by the International Settlment Associations (ISA) as outlined  within
 https://www.numeraire.work/ 
