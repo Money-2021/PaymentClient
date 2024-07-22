@@ -13,7 +13,7 @@
      var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(userToken);
      Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
      HttpClient _httpClient = new HttpClient();
-     string _relativeUrl = "api/Payment/Balance";
+     string _relativeUrl = "api/Coin/Balance";
      Uri _uri = new Uri(_baseUri, _relativeUrl);
      _httpClient.BaseAddress = _baseUri;
      _httpClient.DefaultRequestHeaders.Add("x-token", userToken);
