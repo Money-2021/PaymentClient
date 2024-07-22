@@ -1,7 +1,7 @@
 Principles:
 1. While the API is a RPC HTTP envionment all APDU's are stateless and hence self contained datagrams.
 2. All Coins are stateless datagrams
-3. Within the Finacial Market Infastucture, which includes the payment rail, there exist no ledgers, no accounts, no network, no seessions, no wallet and no counterparties 
+3. Within the Financial Market Infrastructure, which includes the payment rail, there exist no ledgers, no accounts, no network, no sessions, no wallets and no counterparties  or risk.
 4. All payments are between two payment Secure Identity endpoints, with absolute payment finality
 5. All Coins moves offline, as a tangible bearer object, via a trusted path, and cannot be spent, hence it can never be double spent.
 6. The cycle of a Coin->Mint…Move...Destroy demands that a single Coin balance, is always the result, of any payment flow, hence all Coins must have a temporal existance.
