@@ -1,6 +1,7 @@
 // User Token Payments
+// LOCAL CURRENCY AREA PAYMENT
 [TestMethod]
-public void UseCase_payment_coin_pay_to_sin()
+public void UseCase_coin_pay_to_sin()
 {
     // PayToSin combined Mint Coin plus Process Coin
 
@@ -86,6 +87,120 @@ public void UseCase_payment_coin_pay_to_sin()
     SignHashResponse r = System.Text.Json.JsonSerializer.Deserialize<SignHashResponse>(response.Content.ReadAsStringAsync().Result);
     byte[] signature = r.Signature;
     bool bResult = VerifySignature(hashBytes, signature, r.EcDsaPublicKey);
+    if (bResult == false)
+        throw new Exception();
+
+    // Load post content 
+    StringContent content = new StringContent(signHashResponse);
+    // Post to debit infastruture
+    _httpClient = new HttpClient();
+    _relativeUrl = "api/Coin/PayToSin";
+    _uri = new Uri(_baseUri, _relativeUrl);
+    _httpClient.BaseAddress = _baseUri;
+    _httpClient.DefaultRequestHeaders.Add("x-token", payMeToken); // Auth Token
+    response = _httpClient.PostAsync(_uri, content).Result;
+    if (response.IsSuccessStatusCode)
+    {
+        // PaymentResponse to debitor 
+        string json = response.Content.ReadAsStringAsync().Result;
+        string receiptPath = @"D:\Examples\" + node + @"\Payments\CoinPaymentReceipt-" + debit_sin + ".jwt";
+        System.IO.File.WriteAllText(receiptPath, json);
+    }
+    else
+    {
+        string sError = response.Content.ReadAsStringAsync().Result;
+        throw new Exception(sError);
+    }
+}
+
+// CROSS CURRENCY AREA PAYMENT
+[TestMethod]
+public void UseCase_coin_cross_pay_to_sin()
+{
+    // PayToSin combined Mint Coin plus Process Coin
+
+    Set_AUD();
+    string folder = Environment.GetEnvironmentVariable("Envionment");
+
+    // Credit
+    // Generate PayMeToken
+    string credit_sin = Environment.GetEnvironmentVariable("SinB");
+    string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
+    RecoveryResponse rsp = GetUserToken(userTokenPath);
+    string userToken = rsp.userToken;
+    decimal amount = 8; // AUD
+
+    // Extract Function endpoint from User Token
+    var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(userToken);
+    Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+    HttpClient _httpClient = new HttpClient();
+    string _relativeUrl = "api/Coin/IssuePayMeToken?amount=" + amount.ToString("N2");
+    Uri _uri = new Uri(_baseUri, _relativeUrl);
+    _httpClient.BaseAddress = _baseUri;
+    _httpClient.DefaultRequestHeaders.Add("x-token", userToken);
+    HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+    string payMeToken = string.Empty;
+    if (response.IsSuccessStatusCode)
+    {
+        payMeToken = response.Content.ReadAsStringAsync().Result;
+    }
+    else
+    {
+        string sError = response.Content.ReadAsStringAsync().Result;
+        throw new Exception(sError);
+    }
+
+
+    // Use Case: Mint Coin ...
+    // Debit 
+    Set_AZN();
+    folder = Environment.GetEnvironmentVariable("Envionment");
+    string debit_sin = Environment.GetEnvironmentVariable("SinC");
+    userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + debit_sin + ".jwt";
+    rsp = GetUserToken(userTokenPath);
+    userToken = rsp.userToken;
+
+    // Extract Function endpoint from User Token
+    securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(userToken);
+    _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+    // Obtain Function JwToken
+    _httpClient = new HttpClient();
+    // Build funtion endpoint Uri
+    _relativeUrl = "api/User/SignHash?type=" + ProviderType.Payment.ToString();
+    _uri = new Uri(_baseUri, _relativeUrl);
+    _httpClient.BaseAddress = _baseUri;
+
+    // Add User Jwtoken
+    _httpClient.DefaultRequestHeaders.Add("x-token", rsp.userToken);
+    // Add OTP 
+    Guid nonce = Guid.NewGuid();
+    _httpClient.DefaultRequestHeaders.Add("x-nonce", nonce.ToString());
+    // Payment Hash
+    string shash = nonce.ToString() + payMeToken + debit_sin;
+    byte[] hashBytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(shash));
+    _httpClient.DefaultRequestHeaders.Add("x-hash", Convert.ToBase64String(hashBytes));
+
+
+    // autheticate
+    var twoFactorAuthenticator = new Google.Authenticator.TwoFactorAuthenticator();
+    long counter = BytesToLong(hashBytes);
+    string otpPin = twoFactorAuthenticator.GeneratePINAtInterval(rsp.setupcode, counter);
+    _httpClient.DefaultRequestHeaders.Add("x-otp", otpPin);
+    string signHashResponse = null;
+    response = _httpClient.GetAsync(_uri).Result;
+    if (response.IsSuccessStatusCode)
+    {
+        signHashResponse = response.Content.ReadAsStringAsync().Result;
+    }
+    else
+    {
+        string sError = response.Content.ReadAsStringAsync().Result;
+        throw new Exception(sError);
+    }
+    // Test Signature
+    SignHashResponse r = System.Text.Json.JsonSerializer.Deserialize<SignHashResponse>(response.Content.ReadAsStringAsync().Result);
+    byte[] signature = r.Signature;
+    bool bResult = VerifySignature(hashBytes, signature, r.JwkKey);
     if (bResult == false)
         throw new Exception();
 
