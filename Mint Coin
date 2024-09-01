@@ -14,7 +14,7 @@ c) Embedded inside the Audience fild is a URL whcih shoudl be accesses to rtetur
 Example: 
 {"RefinerSin":"0101ce2679e398a42ff3c4d4833124f04d6afa47050f","RefinerCountry":"Australia","SerialNumber":"100015","Fineness":"995.4","GrossWeight":"399.575","LastAuditVaultLocation":"HSBC London","LastAuditDate":"1/04/2014 12:00:00 AM","LastAuditReference":"15918|1|5364"}
 The "LastAuditReference":"15918|1|5364" is the Ausit report reference 15918, the page number 1, 5364 is the page line number for this serialsied Gold Bar. 
-d) The ISA will destroy the Goold bullion bar and hence its serial number and provanance.
+d) The ISA will destroy the physical Gold bullion bar and hence its serial number and provanance.
 
  public static bool ValidateCoinProof(string coinHash, string merkleProof)
  {
