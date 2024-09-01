@@ -1,0 +1,41 @@
+The entire Global World Currecny Unit Supply is anchoured in thereal world to a supply of 400 oz Gold bullion bars whcih form the or=ginal central bank Gold stanard pre 1971. 
+Each of the bar in the supply has been indpendently audited against its custodian and serial number. 
+
+As the  World Currecny Unit Supply is a closed system, only a Mont Coin with provenanace can move non-fungibale gold bullion from the supply into fungibal capital. 
+The essental integrity of the supply is capable of being verified in a fully decentralised mananger via the merkle proof embedde dinside each Mint copin and the Merkle root embedde din the Book Its Money.
+The merkle root is reproduced here as 
+public const string MerkleRoot = "9A151328E2777A0231FF796482640262646F6360AEDAC8D451776F8DEFE18E1E"; 
+
+Mint Coin Veriifcation  process.
+1. Each Coin mustb be indpendely verified by its recipient using the following process..
+a) The merkle proof is extarcted from the Mint Coin
+b) A call is made to the Code below to verify the Coins provenance.
+c) Embedded inside the Audience fild is a URL whcih shoudl be accesses to rteturn the Last Independent Audit of the specific Gold bullion Bar. 
+Example: 
+{"RefinerSin":"0101ce2679e398a42ff3c4d4833124f04d6afa47050f","RefinerCountry":"Australia","SerialNumber":"100015","Fineness":"995.4","GrossWeight":"399.575","LastAuditVaultLocation":"HSBC London","LastAuditDate":"1/04/2014 12:00:00 AM","LastAuditReference":"15918|1|5364"}
+
+
+ public static bool ValidateCoinProof(string coinHash, string merkleProof)
+ {
+     // Extract MerkleRoot published in Book
+     byte[] merkleRoot = Hex.HexToBytes(GlobalProvider.MerkleRoot);
+     byte[] coinHashBytes = Convert.FromBase64String(coinHash);
+     // Extract Merkle Proof 
+     // Deserialise proof
+     Dictionary<string, string>[] values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>[]>(merkleProof);
+     // Load Proof for this Coin
+     MerkleTools.Proof e = new MerkleTools.Proof(coinHashBytes, merkleRoot, SHA256.Create());
+     foreach (Dictionary<string, string> value in values)
+     {
+         if (value.ContainsKey("right"))
+             e.AddRight(Hex.HexToBytes(value.Values.First()));
+         else
+             e.AddLeft(Hex.HexToBytes(value.Values.First()));
+     }
+     // Validate Coin Hash value exists in Supply via the Coin Merkle Proof
+     bool bResult = e.Validate();
+     return bResult;
+ }
+
+
+     
