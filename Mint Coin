@@ -8,7 +8,7 @@ public const string MerkleRoot = "9A151328E2777A0231FF796482640262646F6360AEDAC8
 
 Mint Coin Veriifcation  process.
 1. Each Coin mustb be indpendely verified by its recipient using the following process..
-a) The merkle proof is extarcted from the Mint Coin
+a) The merkle proof and coin hash are extarcted from the signed Mint Coin
 b) A call is made to the Code below to verify the Coins provenance.
 c) Embedded inside the Audience fild is a URL whcih shoudl be accesses to rteturn the Last Independent Audit of the specific Gold bullion Bar. 
 Example: 
