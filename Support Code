@@ -88,46 +88,46 @@ Support Code
      byte[] pBytes = ProtectedData.Unprotect(setupCodeBytes, null, DataProtectionScope.CurrentUser);
      return Convert.ToBase64String(pBytes);
  }
-   private RecoveryResponse user_TokenRefresh(RecoveryResponse r)
-   {
-       // Extract Function endpoint from User Token
-       var securityToken = new JwtSecurityToken(r.userToken);
-       var claim = securityToken.Claims.FirstOrDefault(x => x.Type == "SecureIdentity");
-       string _secureIdentity = claim.Value;
-       claim = securityToken.Claims.FirstOrDefault(x => x.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti);
-       string _jti = claim.Value;
-       Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
-       // Obtain Function JwToken
-       HttpClient _httpClient = new HttpClient();
-       // Build funtion endpoint Uri
-       string _relativeUrl = "api/User/TokenRefresh";
-       Uri _uri = new Uri(_baseUri, _relativeUrl);
-       _httpClient.BaseAddress = _baseUri;
-       // Add User Jwtoken
-       _httpClient.DefaultRequestHeaders.Add("x-token", r.userToken);
-       // Add OTP 
-       var twoFactorAuthenticator = new Google.Authenticator.TwoFactorAuthenticator();
-       byte[] hashBytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(_secureIdentity+_jti));
-       long counter = BytesToLong(hashBytes);
-       string otpPin = twoFactorAuthenticator.GeneratePINAtInterval(r.setupcode, counter);
-       _httpClient.DefaultRequestHeaders.Add("x-otp", otpPin);
-       // Get response
-       HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
-       if (response.IsSuccessStatusCode)
-       {
-           // pass
-           string json = response.Content.ReadAsStringAsync().Result;
-           // New Rec
-           return System.Text.Json.JsonSerializer.Deserialize<RecoveryResponse>(json);
-       }
-       else
-       {
-           // fail
-           string error = response.Content.ReadAsStringAsync().Result;
-           throw new Exception(error);
-       }
-   }
+ private static RecoveryResponse user_TokenRefresh(RecoveryResponse r)
+ {
 
+     // Extract Function endpoint from User Token
+     var securityToken = new JwtSecurityToken(r.userToken);
+     var claim = securityToken.Claims.FirstOrDefault(x => x.Type == "SecureIdentity");
+     string _secureIdentity = claim.Value;
+     claim = securityToken.Claims.FirstOrDefault(x => x.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti);
+     string _jti = claim.Value;
+     Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+     // Obtain Function JwToken
+     HttpClient _httpClient = new HttpClient();
+     // Build funtion endpoint Uri
+     string _relativeUrl = "/User/Refresh";
+     Uri _uri = new Uri(_baseUri, _relativeUrl);
+     _httpClient.BaseAddress = _baseUri;
+     // Add User Jwtoken
+     _httpClient.DefaultRequestHeaders.Add("x-token", r.userToken);
+     // Add OTP 
+     var twoFactorAuthenticator = new Google.Authenticator.TwoFactorAuthenticator();
+     byte[] hashBytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(_secureIdentity + _jti));
+     long counter = BytesToLong(hashBytes);
+     string otpPin = twoFactorAuthenticator.GeneratePINAtInterval(r.setupcode, counter);
+     _httpClient.DefaultRequestHeaders.Add("x-otp", otpPin);
+     // Get response
+     HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+     if (response.IsSuccessStatusCode)
+     {
+         // pass
+         string json = response.Content.ReadAsStringAsync().Result;
+         // New Rec
+         return System.Text.Json.JsonSerializer.Deserialize<RecoveryResponse>(json);
+     }
+     else
+     {
+         // fail
+         string error = response.Content.ReadAsStringAsync().Result;
+         throw new Exception(error);
+     }
+ }
 private static bool VerifySignature(byte[] hashBytes, byte[] signature, byte[] publickKey)
 {
     CngKey key = CngKey.Import(publickKey, CngKeyBlobFormat.EccPublicBlob);
