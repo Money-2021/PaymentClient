@@ -8,7 +8,10 @@ public void TestMethod_execute()
     // Object to Vault
     byte[] data = Encoding.UTF8.GetBytes("This is test content");
     Guid id = add_object(sin, data);   // Vault  Object
-    certify_object(sin, id);  // Certify Vaulted Object 
+    string certificate =  certify_object(sin, id);  // Certify Vaulted Object 
+    // Save
+    string spath = @"D:\Examples\VO\Certificate-" + id.ToString() + ".json";
+    System.IO.File.WriteAllText(spath, certificate);
 
 }
 
@@ -99,7 +102,7 @@ public void TestMethod_execute()
           throw new Exception(error);
       }
   }
-  private void certify_object(string sin, Guid id)
+  private string  certify_object(string sin, Guid id)
   {
       string userTokenPath = @"D:\Examples\VO\Token-" + sin + ".jwt";
       string sToken = System.IO.File.ReadAllText(userTokenPath);
@@ -126,8 +129,8 @@ public void TestMethod_execute()
       {
           // Download proof of existance certificate
           string certificate = response.Content.ReadAsStringAsync().Result;
-          string spath = @"D:\Examples\VO\Certificate-" + id.ToString() + ".json";
-          System.IO.File.WriteAllText(spath, certificate);
+          return certificate;
+        
       }
       else
       {
