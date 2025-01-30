@@ -9,7 +9,7 @@ public void TestMethod_execute()
     byte[] data = Encoding.UTF8.GetBytes("This is test content");
     Guid id = add_object(sin, data);   // Vault  Object
     string certificate =  certify_object(sin, id);  // Certify Vaulted Object 
-    // Save
+      // Save Certificate and Valuted Object Id
     string spath = @"D:\Examples\VO\Certificate-" + id.ToString() + ".json";
     System.IO.File.WriteAllText(spath, certificate);
 
