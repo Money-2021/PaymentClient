@@ -1,0 +1,35 @@
+  [TestMethod]
+  public void UseCase_coin_payme()
+  {
+      // PayToSin combined Mint Coin plus Process Coin
+
+      Set_AUD();
+      string folder = Environment.GetEnvironmentVariable("Envionment");
+
+      // Credit
+      // Generate PayMeToken
+      string credit_sin = Environment.GetEnvironmentVariable("SinB");
+      string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
+      UserToken.RecoveryResponse rsp = UserToken.GetUserToken(userTokenPath);
+      string userToken = rsp.jwToken;
+      decimal amount = 8; // AUD
+
+      // Extract Function endpoint from User Token
+      var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(userToken);
+      Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
+      HttpClient _httpClient = new HttpClient();
+      string _relativeUrl = "Coin/IssuePayMeToken?amount=" + amount.ToString("N2");
+      Uri _uri = new Uri(_baseUri, _relativeUrl);
+      _httpClient.BaseAddress = _baseUri;
+      _httpClient.DefaultRequestHeaders.Add("x-token", userToken);
+      HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+      string payMeToken = string.Empty;
+      if (response.IsSuccessStatusCode)
+      {
+          payMeToken = response.Content.ReadAsStringAsync().Result;
+      }
+      else
+      {
+          string sError = response.Content.ReadAsStringAsync().Result;
+          throw new Exception(sError);
+      }
