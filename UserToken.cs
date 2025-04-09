@@ -1,16 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Metrics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
-using EllipticCurve;
-using Json;
-using SqlServer.Models;
-using static Json.Jwk;
-
-namespace UnitTestProject
-{
+﻿
     public class UserToken
     {
         public class RecoveryResponse
@@ -286,4 +274,4 @@ namespace UnitTestProject
             return hmac.ComputeHash(hashBytes).SequenceEqual(signature);
         }
     }
-}
+
