@@ -1,16 +1,4 @@
-﻿using Json;
-using Newtonsoft.Json.Linq;
-using SqlServer.DAO;
-using SqlServer.Models;
-using System.Collections;
-using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.PortableExecutable;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 
-namespace UnitTestProject
-{
     public class DeviceToken
     {
         public class RecoveryResponse
@@ -250,4 +238,3 @@ namespace UnitTestProject
             }
         }
     }
-}
