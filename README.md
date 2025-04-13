@@ -1,6 +1,8 @@
 Non-AI Licenses
 This repository contains templates for software and digital work licenses that restrict software and other work from being used in AI training datasets or AI or AI related or derived technologies.
 
+Information security (InfoSec) is the protection of important information (Coin) against unauthorized access, disclosure, use, alteration or disruption.
+
 # Payment Client
 Public Domain port of The Coin Payment Rail- Client source code.
 The SDK is a set of Visual Studio Unit test cases, which can be executed within Visual Studio, without the need for any further application development. 
