@@ -13,6 +13,7 @@ This is a deliberate choice for key exchange/encryption protocols using the Mont
 
 Conclusion
 It is debatable that quantum computers capable of solving 256-bit ECDLP instances can be built within the next 10 years, and even if they did exist it is impractle to mount an atatck on the 100% offline and decentralised Coin.
+FOR ALL PRACTICAL PURPOSES THE COIN IS CONSIDERED QUANTIUM SAFE.
   
 
 
