@@ -9,6 +9,7 @@ Within a  unbounded time domain, Curve 25519 provides a high level of security f
 Information Thoretic Secure - Key managment System, and Quantium derived private  key material, the Coin is quantium secure, or at least quantium restant for any given Quantium computing.
 4. EdDSA curve over Fp where p = 2255 − 19 has 8` points where ` was specified. One important feature of Curve25519 is that the quadratic twist also has nearly prime order (precisely, p + 1 + t = 4` 0 for a prime `0). 
 This is a deliberate choice for key exchange/encryption protocols using the Montgomery ladder and x-coordinate arithmetic.
+5. All keys are normalised quantium TRNG's, each Coin has a unique key which is never reused.
 
 Conclusion
 It is debatable that quantum computers capable of solving 256-bit ECDLP instances can be built within the next 10 years, and even if they did exist it is impractle to mount an atatck on the 100% offline and decentralised Coin.
