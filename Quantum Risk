@@ -1,0 +1,19 @@
+The following is a risk assement of the Coin to Quantium based attack, assumign the existance of a practicle quantium computer.
+Elliptic curve cryptography (ECC) is not quantum-resistant. This includes Ed25519.
+1. The essence of all atatck vectors is the ablity of a computer to derive a 'private key' from a published 'public key'. 
+There exist no known security assement for any existing public key process including EdDsa used within the Coin.
+2. EdDSA with RFC 8032-compliant key derivation (e.g., Sui, Solana, Near, Stellar, Aptos, Cosmos) possess an underexplored structural advantage. 
+Specifically, EdDSA’s hash-based deterministic signatures solve some of the security problems of discrete log signatures. 
+Within a  unbounded time domain, Curve 25519 provides a high level of security for the next 10-20 years. Hence t EdDSA using Curve25519 is a good signature scheme for use up to 2030.
+3. Within the time bound doamin of the Coin ( the Coins existance is typically less than 5 seconds) it can be stated that the Coin when coupled with its 
+Information Thoretic Secure - Key managment System, and Quantium derived private  key material, the Coin is quantium secure, or at least quantium restant for any given Quantium computing.
+4. EdDSA curve over Fp where p = 2255 − 19 has 8` points where ` was specified. One important feature of Curve25519 is that the quadratic twist also has nearly prime order (precisely, p + 1 + t = 4` 0 for a prime `0). 
+This is a deliberate choice for key exchange/encryption protocols using the Montgomery ladder and x-coordinate arithmetic.
+
+Conclusion
+It is debatable that quantum computers capable of solving 256-bit ECDLP instances can be built within the next 10 years, and even if they did exist it is impractle to mount an atatck on the 100% offline and decentralised Coin.
+  
+
+
+Notes
+1. https://www.cryptrec.go.jp/exreport/cryptrec-ex-3003-2020.pdf
