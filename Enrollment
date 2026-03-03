@@ -6,7 +6,7 @@ Enrolment Process
 https://github.com/Money-2021/PaymentClient/blob/main/Fido.dll
 4.  Use the Authorisation token and Fido Provider to create the local Fido device as follows:
   // Initialise device
-  Fido.FidoProvider d = new Fido.FidoProvider(authToken);
+  Fido.FidoProvider d = new Fido.FidoProvider(authToken, true);
   d.Enrol(); // Enrol with Infastructure
   string spath = @"D:\Examples\Devices\DeviceStore-" + d.GetDeviceSin() + ".json";
   d.SaveStore(spath);
