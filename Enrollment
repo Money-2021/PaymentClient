@@ -3,7 +3,7 @@ Enrolment Process
 1. Obtain a subscripotion from any Coin or Vaulted Object partner
 2. They will return a Device Authorisation JwToken good for 48 hrs
 3. Downlaod Fido Provider
-
+https://github.com/Money-2021/PaymentClient/blob/main/Fido.dll
 4.  Use the Authorisation token and Fido Provider to create the local Fido device as follows:
   // Initialise device
   Fido.FidoProvider d = new Fido.FidoProvider(authToken);
