@@ -11,5 +11,11 @@ https://github.com/Money-2021/PaymentClient/blob/main/Fido.dll
   string spath = @"D:\Examples\Devices\DeviceStore-" + d.GetDeviceSin() + ".json";
   d.SaveStore(spath);
 
+Recovery Process
+1. One each device enrollement a protected recovery pin is provided and stored with the Fido Device Store.
+2. It is the users responsablity top retieve the unprotected pin from the fido store and securely store outside of the device.
+Upon loss or copmp[romise this pin is required to move or create a new fido device.
+If this pin is list the tthe use must contatc their node operator and proviide account identifcation to recover this pin, this is on a fee for serivce basis.
+
 Note
 1. The Auth Token is ITSDSA signed hence cannot be created outside of the infastcuture, and is validated within the Enrolment request.
