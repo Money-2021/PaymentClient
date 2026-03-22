@@ -187,6 +187,11 @@ Section 2 -- Scope.
                Licensed Material if doing so restricts exercise of the
                Licensed Rights by any recipient of the Licensed
                Material.
+            c. The Licencee, shall publish any derivative binary libary on Github,
+               along with this licence: 
+               https://github.com/Money-2021/PaymentClient/blob/main/LICENSE.
+               The Licencee shall provide such libruary within 30days of its 
+               internal distribuition of any derivative libary.
 
        6. No endorsement. Nothing in this Public License constitutes or
           may be construed as permission to assert or imply that You
