@@ -13,7 +13,7 @@ Steps
 4. Adapt the supplied code to your local MSTest envionment. including configuration of your DeviceToken pathway.
 5. Execute the supplied UnitTest cases to verify correct operation of the code funtionality.
 
-Suggested Test flow
+Suggested MSTest flow
 1. UseCase_coin_balance()
 2. UseCase_coin_local_pay_to_sin()
 3. UseCase_coin_balance() for each Sin to verify payment flow betwen payment parties.
