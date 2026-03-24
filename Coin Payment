@@ -5,58 +5,55 @@
   {
       // SinB pays SinA in PayMe token
 
-      Set_AUD();
-      string folder = Environment.GetEnvironmentVariable("Envionment");
-      decimal amount = 5;
-      // Step 1: Generate Credit PayMeToken
-      string credit_sin = Environment.GetEnvironmentVariable("SinA");
-
-      string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
-      UserToken.RecoveryResponse rsp = UserToken.GetUserToken(userTokenPath);
-      string userToken = rsp.jwToken;
-      // Generate PayMeToken
-      string payMeToken = UserToken.PayMeToken(userTokenPath, amount);
-
-      // ... send PayMeToken to Debit Secure Identity
-
-      //Step 2: Debit Authorisation Token
-      string debit_sin = Environment.GetEnvironmentVariable("SinB");
-      // Debit user token
-      userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + debit_sin + ".jwt";
-      rsp = UserToken.GetUserToken(userTokenPath);
-
-      // Payment Hash(payMeToken)
-      byte[] hashBytes = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(payMeToken + debit_sin));
-      // Generate Debit functionToken
-      string functionToken = UserToken.SignHash(userTokenPath, hashBytes);
-                
-      // Load post content 
-      StringContent postContent = new StringContent(functionToken);
-      // Extract Function endpoint from User Token
-      JwtSecurityToken securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(rsp.jwToken);
-      Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
-      //_baseUri = new Uri("http://localhost:54718/");
-      HttpClient _httpClient = new HttpClient();
-      // Build funtion endpoint Uri
-      string _relativeUrl = "Coin/PayToSin";
-      Uri _uri = new Uri(_baseUri, _relativeUrl);
-      _httpClient.BaseAddress = _baseUri;
-      // Add User Jwtoken
-      _httpClient.DefaultRequestHeaders.Add("x-token", payMeToken);
-      // Post Payment
-      HttpResponseMessage response = _httpClient.PostAsync(_uri, postContent).Result;
-      if (response.IsSuccessStatusCode)
-      {
-          string jwToken = response.Content.ReadAsStringAsync().Result;
-          string s = @"D:\Examples\" + node + @"\Payments\PayReceipt-" + debit_sin + ".json";
-          System.IO.File.WriteAllText(s, jwToken);
-      }
-      else
-      {
-          //
-          string error = response.Content.ReadAsStringAsync().Result;
-          throw new Exception(error);
-      }
+       Set_AUD();
+       string folder = Environment.GetEnvironmentVariable("Envionment");
+       decimal amount = 5;
+       // Step 1: Generate Credit PayMeToken
+       string credit_sin = Environment.GetEnvironmentVariable("SinA");
+    
+       string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".json";
+       Fido.FidoProvider fp = new Fido.FidoProvider(userTokenPath);
+       string userToken = fp.GetJwToken();
+      
+       // Generate PayMeToken
+       string payMeToken = Support.PayMe(userTokenPath, amount);
+    
+       // ... send PayMeToken to Debit Secure Identity
+    
+       //Step 2: Debit Authorisation Token
+       string debit_sin = Environment.GetEnvironmentVariable("SinB");
+       // Debit user token
+       userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + debit_sin + ".json";
+       fp = new Fido.FidoProvider(userTokenPath);
+    
+       // Load PayMe post content 
+       StringContent content = new StringContent(payMeToken);  // Credit Token
+       // Extract Function endpoint from User Token
+       Uri _baseUri = new Uri(fp.Audience());
+       HttpClient _httpClient = new HttpClient();
+       // Build funtion endpoint Uri
+       string _relativeUrl = "Coin/PayToSin";
+       Uri _uri = new Uri(_baseUri, _relativeUrl);
+       _httpClient.BaseAddress = _baseUri;
+       // Add User Device Jwtoken
+       _httpClient.DefaultRequestHeaders.Add("x-token", fp.GetJwToken());
+       string shash = payMeToken + fp.GetSecureIdentity();
+       string ssign = fp.Sign(shash);
+       _httpClient.DefaultRequestHeaders.Add("x-jws-signature", ssign);
+       // Post Payment
+       HttpResponseMessage response = _httpClient.PostAsync(_uri,content).Result;
+       if (response.IsSuccessStatusCode)
+       {
+           string jwToken = response.Content.ReadAsStringAsync().Result;
+           string s = @"D:\Examples\" + node + @"\Payments\PayReceipt-" + debit_sin + ".json";
+           System.IO.File.WriteAllText(s, jwToken);
+       }
+       else
+       {
+           //
+           string error = response.Content.ReadAsStringAsync().Result;
+           throw new Exception(error);
+       }
 
   }
 
