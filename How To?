@@ -1,0 +1,20 @@
+
+This file provides the step of how to use this site supplied code base.
+
+Development Envionment
+1. Windows 11 2025 Update (Version 25H2)
+2. Visual Studio 2022
+3. Obtain a "Device Token" from your node operator, this will self configure your devlopment envionment.
+
+Steps
+1. Download the supplied Fido Provider here https://github.com/Money-2021/VaultedObjects/blob/main/Fido.dll
+2. Great new Visual Studio Net8.0 MSTest (Microsoft's built-in framework)
+3. Down laod the UnitTest cases as provided
+4. Adapt the supplied code to your local MSTest envionment. including configuration of your DeviceToken pathway.
+5. Execute the supplied UnitTest cases to verify correct operation of the code funtionality.
+
+Notes
+1. Typically a professional developer should allocate around 30 minutes to dcomplete the fist test case.
+2. Visual Studion should automaticlaly download or request the download of all required Net8.0 supporting libaries.
+
+Enjoy the new world of Information Thretic Secured Payments world.
