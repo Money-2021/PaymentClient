@@ -1,37 +1,49 @@
 1. Issue LCU PayMe Token
 
   [TestMethod]
-  public void UseCase_coin_payme()
-  {
-      // PayToSin combined Mint Coin plus Process Coin
+ public void UseCase_coin_payme()
+ {
+     // PayToSin combined Mint Coin plus Process Coin
 
-      Set_AUD();
-      string folder = Environment.GetEnvironmentVariable("Envionment");
+     Set_AUD();
+     string folder = Environment.GetEnvironmentVariable("Envionment");
 
-      // Credit
-      // Generate PayMeToken
-      string credit_sin = Environment.GetEnvironmentVariable("SinB");
-      string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".jwt";
-      UserToken.RecoveryResponse rsp = UserToken.GetUserToken(userTokenPath);
-      string userToken = rsp.jwToken;
-      decimal amount = 8; // AUD
+     // Credit
+     // Generate PayMeToken
+     string credit_sin = Environment.GetEnvironmentVariable("SinB");
+     string userTokenPath = @"D:\Examples\" + node + @"\" + folder + "\\Token-" + credit_sin + ".json";
 
-      // Extract Function endpoint from User Token
-      var securityToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(userToken);
-      Uri _baseUri = new Uri(securityToken.Audiences.FirstOrDefault());
-      HttpClient _httpClient = new HttpClient();
-      string _relativeUrl = "Coin/IssuePayMeToken?amount=" + amount.ToString("N2");
-      Uri _uri = new Uri(_baseUri, _relativeUrl);
-      _httpClient.BaseAddress = _baseUri;
-      _httpClient.DefaultRequestHeaders.Add("x-token", userToken);
-      HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
-      string payMeToken = string.Empty;
-      if (response.IsSuccessStatusCode)
-      {
-          payMeToken = response.Content.ReadAsStringAsync().Result;
-      }
-      else
-      {
-          string sError = response.Content.ReadAsStringAsync().Result;
-          throw new Exception(sError);
-      }
+     Fido.FidoProvider fp = new Fido.FidoProvider(userTokenPath);
+     string userToken = fp.GetJwToken();
+     decimal amount = 8; // AUD
+
+      Uri _baseUri = new Uri(fp.Audience());
+
+     // Obtain JwToken
+     string samount = amount.ToString("N2");
+     HttpClient _httpClient = new HttpClient();
+     string _relativeUrl = "Coin/IssuePayMeToken?amount=" + samount;
+     Uri _uri = new Uri(_baseUri, _relativeUrl);
+     _httpClient.BaseAddress = _baseUri;
+     // Add Device Jwtoken
+     _httpClient.DefaultRequestHeaders.Add("x-token", fp.GetJwToken());
+     // Add device signature
+     string shash = fp.GetSecureIdentity() + samount;
+     string signature = fp.Sign(shash);
+     _httpClient.DefaultRequestHeaders.Add("x-jws-signature", signature);
+
+     // Add Device Jwtoken
+     _httpClient.DefaultRequestHeaders.Add("x-counter", fp.GetCounter().ToString());
+     // Get response
+     HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+     string payMeToken = string.Empty;
+     if (response.IsSuccessStatusCode)
+     {
+         payMeToken = response.Content.ReadAsStringAsync().Result;
+     }
+     else
+     {
+         string sError = response.Content.ReadAsStringAsync().Result;
+         throw new Exception(sError);
+     }
+ }
