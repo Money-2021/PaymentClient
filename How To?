@@ -8,6 +8,7 @@ Development Envionment
 
 Steps
 1. Download the supplied Fido Provider here https://github.com/Money-2021/VaultedObjects/blob/main/Fido.dll
+   and the Support file here: https://github.com/Money-2021/PaymentClient/blob/main/Support
 2. Great new Visual Studio Net8.0 MSTest (Microsoft's built-in framework)
 3. Down laod the UnitTest cases as provided
 4. Adapt the supplied code to your local MSTest envionment. including configuration of your DeviceToken pathway.
