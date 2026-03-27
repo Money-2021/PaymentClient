@@ -61,7 +61,11 @@ public class Support
             public byte[] Signature { get; set; }
         }
 
+        // Debit
         public string DebitSecureIdentity { get; set; }
+        public decimal DebitAmount { get; set; }
+        public string DebitAssetId { get; set; }
+
         public string CreditSecureIdentity { get; set; }
         public decimal CreditAmount { get; set; }
         public string CreditAssetId { get; set; }
