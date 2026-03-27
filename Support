@@ -1,0 +1,84 @@
+
+public class Support
+{
+    public static Guid MaxValue = new Guid("FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF");
+
+   
+    public static string PayMe(string userTokenPath, decimal amount)
+    {
+        Fido.FidoProvider fp = new Fido.FidoProvider(userTokenPath);
+        // Extract endpoint from Device Token
+        Uri _baseUri = new Uri(fp.Audience());
+
+        // Obtain JwToken
+        string samount = amount.ToString("N2"); // Amount in cents
+        HttpClient _httpClient = new HttpClient();
+        string _relativeUrl = "Coin/IssuePayMeToken?amount=" + samount;
+        Uri _uri = new Uri(_baseUri, _relativeUrl);
+        _httpClient.BaseAddress = _baseUri;
+        // Add Device Jwtoken
+        _httpClient.DefaultRequestHeaders.Add("x-token", fp.GetJwToken());
+        // Add device signature
+        string shash = fp.GetSecureIdentity() + samount;
+        string signature = fp.Sign(shash);
+        _httpClient.DefaultRequestHeaders.Add("x-jws-signature", signature);
+
+        // Test
+        string sin = ApplicationJwtProvider.ExtractSecureIdentity(fp.GetJwToken());
+        SqlServer.DAL.EntityDB.VerifyJwSignature(sin, shash, signature);
+
+        // Add Device Jwtoken
+        _httpClient.DefaultRequestHeaders.Add("x-counter", fp.GetCounter().ToString());
+        // Get response
+        HttpResponseMessage response = _httpClient.GetAsync(_uri).Result;
+        if (response.IsSuccessStatusCode)
+        {
+
+            Stream receiveStream = response.Content.ReadAsStream();
+            StreamReader reader = new StreamReader(receiveStream, Encoding.UTF8);
+            string jwToken = reader.ReadToEnd();
+            return jwToken;
+        }
+        else
+        {
+            // fail
+            string error = response.Content.ReadAsStringAsync().Result;
+            if (string.IsNullOrEmpty(error))
+            {
+                error = response.ReasonPhrase;
+            }
+            throw new Exception(error);
+        }
+
+    }
+  
+    
+    public class PaymentResponse
+    {
+        public class PaymentSignature
+        {
+            public string PublicKey { get; set; }
+            public byte[] Signature { get; set; }
+        }
+
+        public string DebitSecureIdentity { get; set; }
+        public string CreditSecureIdentity { get; set; }
+        public decimal CreditAmount { get; set; }
+        public string CreditAssetId { get; set; }
+        // Payment Details
+        public String PaymentId { get; set; }
+        public string PaidDate { get; set; }
+        public decimal PaidAmount { get; set; }
+        public string PaidAssetId { get; set; }
+        public PaymentSignature Signature { get; set; }
+        public bool IsVerified { get; set; }
+
+        public static bool Verify(string json)
+        {
+            PaymentResponse _receipt = JsonSerializer.Deserialize<PaymentResponse>(json);
+            string shash = _receipt.PaidAmount.ToString("N2") + _receipt.DebitSecureIdentity + _receipt.CreditSecureIdentity;
+            Fido.EdDsa ed = new Fido.EdDsa(_receipt.Signature.PublicKey);
+            return ed.VerifyData(shash, _receipt.Signature.Signature);
+        }
+    }
+}
